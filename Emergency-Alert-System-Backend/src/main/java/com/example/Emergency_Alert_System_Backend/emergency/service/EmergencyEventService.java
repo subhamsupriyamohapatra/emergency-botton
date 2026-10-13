@@ -74,7 +74,7 @@ public class EmergencyEventService {
                 .collect(Collectors.groupingBy(
                         device -> device.getMember().getId()));
 
-        List<EmergencyEventResponse.MemberInfo> recipients =
+        List<EmergencyEventResponse.RecipientInfo> recipients =
                 new ArrayList<>();
         int successCount = 0;
         int failureCount = 0;
@@ -85,14 +85,12 @@ public class EmergencyEventService {
                 continue;
             }
 
-            recipients.add(new EmergencyEventResponse.MemberInfo(
-                    member.getId(),
-                    member.getMemberName(),
-                    member.getEmail()
-            ));
+            List<DeviceRegistration> memberDevices =
+                    devicesByMember.getOrDefault(member.getId(), List.of());
+            int deviceCount = memberDevices.size();
+            int memberSuccessCount = 0;
 
-            for (DeviceRegistration device :
-                    devicesByMember.getOrDefault(member.getId(), List.of())) {
+            for (DeviceRegistration device : memberDevices) {
                 try {
                     firebaseMessagingService.sendNotification(
                             device.getFcmToken(),
@@ -100,9 +98,8 @@ public class EmergencyEventService {
                             "An emergency has been reported in room "
                                     + room.getRoomNumber()
                     );
-                    successCount++;
+                    memberSuccessCount++;
                 } catch (Exception e) {
-                    failureCount++;
                     // One failed device must not prevent other notifications.
                     log.error(
                             "Failed to notify device registration ID {}",
@@ -111,6 +108,34 @@ public class EmergencyEventService {
                     );
                 }
             }
+
+            boolean notified = memberSuccessCount > 0;
+            String status;
+            if (deviceCount == 0) {
+                status = "NO_DEVICE";
+            } else if (notified) {
+                status = "SENT";
+            } else {
+                status = "FAILED";
+            }
+
+            // Counts are per recipient (room member), not per device:
+            // a member is one success if any of their devices received the
+            // alert, otherwise one failure (including members with no device).
+            if (notified) {
+                successCount++;
+            } else {
+                failureCount++;
+            }
+
+            recipients.add(new EmergencyEventResponse.RecipientInfo(
+                    member.getId(),
+                    member.getMemberName(),
+                    member.getEmail(),
+                    deviceCount,
+                    notified,
+                    status
+            ));
         }
 
         return new EmergencyEventResponse(

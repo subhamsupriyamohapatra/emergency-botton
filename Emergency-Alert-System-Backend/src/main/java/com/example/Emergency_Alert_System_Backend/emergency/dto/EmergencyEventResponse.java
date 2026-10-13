@@ -17,7 +17,7 @@ public class EmergencyEventResponse {
     private LocalDateTime createdAt;
     private RoomInfo room;
     private MemberInfo triggeredBy;
-    private List<MemberInfo> recipients;
+    private List<RecipientInfo> recipients;
     private int notificationSuccessCount;
     private int notificationFailureCount;
 
@@ -36,5 +36,17 @@ public class EmergencyEventResponse {
         private Long memberId;
         private String memberName;
         private String email;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecipientInfo {
+        private Long memberId;
+        private String memberName;
+        private String email;
+        private int deviceCount;
+        private boolean notified;
+        private String status;
     }
 }
