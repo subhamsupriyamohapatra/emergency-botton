@@ -1,5 +1,6 @@
 package com.example.Emergency_Alert_System_Backend.emergency.entity;
 
+import com.example.Emergency_Alert_System_Backend.member.entity.Member;
 import com.example.Emergency_Alert_System_Backend.room.entity.Room;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,10 @@ public class EmergencyEvent {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "triggered_by_member_id")
+    private Member triggeredBy;
 
     @Column(nullable = false)
     private String status = "RECEIVED";

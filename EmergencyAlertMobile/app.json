@@ -5,11 +5,17 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging"
+    ],
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.subham.emergencyalert",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

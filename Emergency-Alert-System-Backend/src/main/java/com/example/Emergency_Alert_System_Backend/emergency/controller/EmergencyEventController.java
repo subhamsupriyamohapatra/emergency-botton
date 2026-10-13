@@ -1,5 +1,6 @@
 package com.example.Emergency_Alert_System_Backend.emergency.controller;
 
+import com.example.Emergency_Alert_System_Backend.emergency.dto.EmergencyEventResponse;
 import com.example.Emergency_Alert_System_Backend.emergency.entity.EmergencyEvent;
 import com.example.Emergency_Alert_System_Backend.emergency.service.EmergencyEventService;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +17,10 @@ public class EmergencyEventController {
 
     @PostMapping("/rooms/{roomId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public EmergencyEvent createEmergencyEvent(
-            @PathVariable Long roomId) {
-        return emergencyEventService.createEmergencyEvent(roomId);
+    public EmergencyEventResponse createEmergencyEvent(
+            @PathVariable Long roomId,
+            @RequestParam Long memberId) {
+        return emergencyEventService.createEmergencyEvent(roomId, memberId);
     }
 
     @GetMapping
